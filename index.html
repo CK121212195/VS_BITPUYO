@@ -76,7 +76,9 @@ h1.logo .b{color:var(--gold);}
   border-radius:6px; box-shadow:0 0 35px rgba(0,0,0,.15),inset 0 0 50px rgba(0,0,0,.8);
   overflow: hidden; height: 70vh; min-height: 500px; aspect-ratio: 1/2; margin: 0 auto; transition: 0.3s;
 }
-#gw.vs-mode { aspect-ratio: auto; width: 100%; min-width: 650px; }
+/* VSモード時はアスペクト比を適切に変更し、heightの制限を外す */
+#gw.vs-mode { aspect-ratio: 800 / 720; width: 100%; height: auto; min-height: auto; min-width: 650px; }
+
 #gc{width: 100%; height: 100%; display: block;}
 
 #bflash{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(255,215,100,.95) 0%,rgba(213,208,200,.95) 100%);pointer-events:none;opacity:0;z-index:15;}
@@ -113,7 +115,7 @@ h1.logo .b{color:var(--gold);}
 @media(max-width:960px){
   #app{ grid-template-columns:190px auto 190px; }
   #app.vs-mode { grid-template-columns: 1fr; grid-template-areas: "cc" "lc" "rc"; }
-  #gw.vs-mode { min-width: 100%; height: 50vh; }
+  #gw.vs-mode { min-width: 100%; height: auto; }
 }
 </style>
 </head>
@@ -197,6 +199,11 @@ h1.logo .b{color:var(--gold);}
 const COLS=6, ROWS=12, CELL=60; 
 const canvas=document.getElementById('gc');
 const ctx=canvas.getContext('2d');
+
+// 【修正】初期解像度を明示的にセット
+canvas.width = COLS * CELL;
+canvas.height = ROWS * CELL;
+
 const nctx=document.getElementById('nc').getContext('2d');
 document.getElementById('nc').width = 240; document.getElementById('nc').height = 240;
 
@@ -362,13 +369,17 @@ function update(){
     if(p.state==='PLAY'){
       if(!p.active){
         if(p.ojamaQueue > 0) {
+          // 【修正】空いている列からランダムにおじゃまを落とす
           let dropCount = Math.min(p.ojamaQueue, COLS);
-          p.ojamaQueue -= dropCount;
-          for(let i=0; i<dropCount; i++) {
-            let c = Math.floor(Math.random() * COLS);
-            if(p.board[0][c] === null) p.board[0][c] = 'dust';
-          }
-          p.state = 'FALL'; return;
+          let cols = [];
+          for(let i=0; i<COLS; i++) if(p.board[0][i] === null) cols.push(i);
+          cols.sort(() => Math.random() - 0.5);
+          
+          let actualDrop = Math.min(dropCount, cols.length);
+          p.ojamaQueue -= actualDrop;
+          for(let i=0; i<actualDrop; i++) p.board[0][cols[i]] = 'dust';
+          
+          if(actualDrop > 0) { p.state = 'FALL'; return; }
         }
         if(!p.nextPiece){loadNextFor(p);return;}
         if(!p.spawn()){gameOver(p.isCPU ? 'YOU WIN! 🎉' : 'CPU WINS! ☠️');return;}
@@ -556,7 +567,6 @@ async function payForCPU() {
   try {
     if (typeof window.webln !== 'undefined') {
       await window.webln.enable();
-      // Dummy keysend for demo purposes
       await window.webln.keysend({
         destination: "032b4b45fc3bd652e92c2ab75b2259a4bbdf9efc2d5861de517efeb96cde6e2f17", 
         amount: 1000
@@ -580,11 +590,18 @@ function startGame(vsCPU = false){
   if(vsCPU) {
     const margin = 80;
     players.push(new Player(1, true, COLS*CELL + margin));
+    
+    // 【修正】VSモード時も高さ（height）を明示的に指定
     canvas.width = COLS*CELL*2 + margin;
+    canvas.height = ROWS*CELL; 
+    
     document.getElementById('gw').classList.add('vs-mode');
     document.getElementById('app').classList.add('vs-mode');
   } else {
+    // 【修正】SOLOモード時の解像度
     canvas.width = COLS*CELL;
+    canvas.height = ROWS*CELL;
+    
     document.getElementById('gw').classList.remove('vs-mode');
     document.getElementById('app').classList.remove('vs-mode');
   }
