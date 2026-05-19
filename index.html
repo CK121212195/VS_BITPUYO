@@ -66,9 +66,14 @@ h1.logo .b { color: var(--gold); }
 ========================================================== */
 #game-container {
   position: relative; z-index: 10; display: grid;
-  /* 左(P1)、中央(UI)、右(CPU) をバランスよく配置 */
-  grid-template-columns: minmax(280px, 1fr) 320px minmax(280px, 1fr);
-  gap: 30px; padding: 30px 20px; width: 100%; max-width: 1400px; margin: 0 auto;
+  
+  /* ★修正箇所1：各パネルの幅を調整し、真ん中を固定、左右を柔軟に */
+  grid-template-columns: minmax(220px, 1fr) 280px minmax(220px, 1fr);
+  
+  /* ★致命的バグ修正：エリアの配置指定が抜けていました！ */
+  grid-template-areas: "p1 cp cpu"; 
+  
+  gap: 20px; padding: 20px; width: 100%; max-width: 1200px; margin: 0 auto;
   align-items: start; justify-items: center;
 }
 
@@ -76,32 +81,34 @@ h1.logo .b { color: var(--gold); }
    PLAYER BOARDS
 ========================================================== */
 .player-panel {
-  display: flex; flex-direction: column; width: 100%; max-width: 420px;
-  background: var(--panel); padding: 16px; border-radius: 12px;
+  display: flex; flex-direction: column; width: 100%; 
+  /* ★修正箇所2：画面の「高さ(vh)」基準で最大幅を制限し、はみ出しを完全防止 */
+  max-width: 38vh; 
+  min-width: 220px;
+  background: var(--panel); padding: 12px; border-radius: 12px;
   border: 1px solid var(--panel-bdr); box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
 .player-header {
   display: flex; justify-content: space-between; align-items: flex-end;
-  margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px dashed var(--panel-bdr);
+  margin-bottom: 8px; padding-bottom: 6px; border-bottom: 2px dashed var(--panel-bdr);
 }
-.player-name { font-family: var(--font-hud); font-weight: 900; font-size: 1.4rem; letter-spacing: 0.05em; }
+.player-name { font-family: var(--font-hud); font-weight: 900; font-size: 1.2rem; letter-spacing: 0.05em; }
 .name-p1 { color: var(--blue); }
 .name-cpu { color: var(--red); }
-.player-score { font-family: var(--font-hud); font-weight: 900; font-size: 2rem; color: var(--amber); line-height: 1; }
-.score-label { font-size: 0.6rem; color: var(--text-dim); text-align: right; display: block; margin-bottom: 2px; }
+.player-score { font-family: var(--font-hud); font-weight: 900; font-size: 1.6rem; color: var(--amber); line-height: 1; }
+.score-label { font-size: 0.55rem; color: var(--text-dim); text-align: right; display: block; margin-bottom: 2px; }
 
 .ojama-tray {
-  width: 100%; height: 38px; background: rgba(0,0,0,0.06); border-radius: 6px;
+  width: 100%; height: 32px; background: rgba(0,0,0,0.06); border-radius: 6px;
   border: 1px solid var(--panel-bdr); display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-hud); font-weight: 900; font-size: 1.2rem; color: var(--red);
+  font-family: var(--font-hud); font-weight: 900; font-size: 1.1rem; color: var(--red);
   margin-bottom: 8px; transition: background 0.2s;
 }
 .ojama-tray.warning { background: rgba(217, 56, 56, 0.15); animation: pulse 1s infinite alternate; }
 @keyframes pulse { from { box-shadow: inset 0 0 0px rgba(217,56,56,0); } to { box-shadow: inset 0 0 15px rgba(217,56,56,0.4); } }
 
-/* はみ出し防止：縦横比を完璧に固定したコンテナ */
 .board-wrapper {
-  position: relative; width: 100%; aspect-ratio: 6 / 12; /* ぷよぷよ基準の縦横比 */
+  position: relative; width: 100%; aspect-ratio: 6 / 12; 
   background: var(--game-bg); border-radius: 8px; border: 4px solid #333;
   box-shadow: inset 0 0 60px rgba(0,0,0,0.9), 0 5px 15px rgba(0,0,0,0.2);
   overflow: hidden;
@@ -117,86 +124,85 @@ h1.logo .b { color: var(--gold); }
    CENTER UI PANELS
 ========================================================== */
 .center-panel {
-  display: flex; flex-direction: column; gap: 16px; width: 100%;
+  display: flex; flex-direction: column; gap: 12px; width: 100%;
 }
 .ui-box {
   background: var(--panel); border: 1px solid var(--panel-bdr); border-radius: 8px;
-  padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.04);
 }
 .ui-title {
   font-family: var(--font-hud); font-size: 0.65rem; font-weight: 700; color: var(--text-dim);
-  text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+  text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
   letter-spacing: 0.1em; border-bottom: 1px solid var(--panel-bdr); padding-bottom: 6px;
 }
 .ui-title i { color: var(--amber); font-style: normal; font-size: 0.8rem; }
 
 /* NEXT PIECE */
 .next-wrapper {
-  width: 100%; height: 160px; background: var(--game-bg); border-radius: 6px;
+  width: 100%; height: 120px; background: var(--game-bg); border-radius: 6px;
   border: 2px solid #333; display: flex; align-items: center; justify-content: center;
   box-shadow: inset 0 0 20px rgba(0,0,0,0.8); margin-bottom: 8px;
 }
 .next-wrapper canvas { width: 100%; height: 100%; object-fit: contain; }
 .next-info { display: flex; justify-content: space-between; align-items: flex-end; }
-.next-tier { font-family: var(--font-hud); font-size: 1.1rem; font-weight: 900; }
-.next-amt { font-size: 0.65rem; color: var(--text-dim); }
+.next-tier { font-family: var(--font-hud); font-size: 1rem; font-weight: 900; }
+.next-amt { font-size: 0.6rem; color: var(--text-dim); }
 
 /* MEMPOOL STATS */
-.stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .stat-row:last-child { margin-bottom: 0; }
-.stat-label { font-size: 0.65rem; color: var(--text-dim); }
-.stat-val { font-family: var(--font-hud); font-weight: 700; font-size: 1.1rem; color: var(--amber); }
+.stat-label { font-size: 0.6rem; color: var(--text-dim); }
+.stat-val { font-family: var(--font-hud); font-weight: 700; font-size: 1rem; color: var(--amber); }
 
 /* TX QUEUE */
 .q-list { display: flex; flex-direction: column; gap: 4px; }
 .q-item {
-  display: flex; align-items: center; gap: 8px; font-size: 0.65rem; padding: 4px 6px;
+  display: flex; align-items: center; gap: 8px; font-size: 0.6rem; padding: 4px 6px;
   background: rgba(0,0,0,0.03); border-radius: 4px; border: 1px solid rgba(0,0,0,0.05);
 }
-.q-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.q-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .q-name { color: var(--text-mid); font-weight: bold; }
 .q-amt { margin-left: auto; color: var(--text); font-family: var(--font-mono); }
 
-/* CONTROLS & SETTINGS */
-.ctrl-row { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-dim); margin-bottom: 6px; }
+/* CONTROLS */
+.ctrl-row { display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--text-dim); margin-bottom: 6px; }
 .ctrl-key { font-family: var(--font-hud); background: #dcd6cc; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--panel-bdr); color: var(--text-mid); }
 .btn-snd {
-  width: 100%; margin-top: 10px; padding: 10px; background: var(--bg); border: 1px solid var(--panel-bdr);
-  border-radius: 4px; color: var(--text-dim); font-family: var(--font-mono); font-size: 0.7rem;
+  width: 100%; margin-top: 8px; padding: 8px; background: var(--bg); border: 1px solid var(--panel-bdr);
+  border-radius: 4px; color: var(--text-dim); font-family: var(--font-mono); font-size: 0.65rem;
   font-weight: bold; cursor: pointer; transition: 0.2s;
 }
 .btn-snd:hover { border-color: var(--amber); color: var(--amber); }
 .btn-snd.on { color: var(--green); border-color: var(--green); }
 
 /* ==========================================================
-   OVERLAYS (Start, Game Over, Block Mined)
+   OVERLAYS
 ========================================================== */
 #overlays { position: fixed; inset: 0; pointer-events: none; z-index: 100; display: flex; justify-content: center; align-items: center; }
 
 .modal {
-  pointer-events: auto; background: rgba(232,228,220,0.95); padding: 40px 50px; border-radius: 12px;
+  pointer-events: auto; background: rgba(232,228,220,0.95); padding: 30px 40px; border-radius: 12px;
   border: 2px solid var(--panel-bdr); text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-  display: flex; flex-direction: column; align-items: center; max-width: 500px; width: 90%;
+  display: flex; flex-direction: column; align-items: center; max-width: 450px; width: 90%;
   backdrop-filter: blur(5px); transition: opacity 0.3s;
 }
 .modal.hidden { opacity: 0; pointer-events: none; display: none; }
 
-.m-title { font-family: var(--font-hud); font-size: 2.8rem; font-weight: 900; color: var(--amber); margin-bottom: 10px; text-shadow: 2px 2px 0 rgba(255,255,255,0.5); }
-.m-desc { font-family: var(--font-jp); font-size: 0.9rem; color: var(--text-mid); line-height: 1.8; margin-bottom: 30px; font-weight: 700; }
+.m-title { font-family: var(--font-hud); font-size: 2.4rem; font-weight: 900; color: var(--amber); margin-bottom: 10px; text-shadow: 2px 2px 0 rgba(255,255,255,0.5); }
+.m-desc { font-family: var(--font-jp); font-size: 0.85rem; color: var(--text-mid); line-height: 1.8; margin-bottom: 20px; font-weight: 700; }
 .m-btn {
-  font-family: var(--font-hud); font-size: 1.1rem; font-weight: 900; letter-spacing: 0.1em;
-  padding: 16px 40px; background: var(--amber); color: #fff; border: none; border-radius: 6px;
+  font-family: var(--font-hud); font-size: 1rem; font-weight: 900; letter-spacing: 0.1em;
+  padding: 14px 30px; background: var(--amber); color: #fff; border: none; border-radius: 6px;
   cursor: pointer; box-shadow: 0 6px 15px rgba(156,99,33,0.3); transition: 0.15s; width: 100%;
 }
 .m-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(156,99,33,0.4); }
 .m-btn:active { transform: translateY(1px); }
 .m-btn.vs { background: linear-gradient(135deg, #f5a623, #ff7b00); color: #000; box-shadow: 0 6px 15px rgba(245,166,35,0.4); }
 
-.win-msg { font-family: var(--font-hud); font-size: 2.5rem; font-weight: 900; margin-bottom: 20px; }
+.win-msg { font-family: var(--font-hud); font-size: 2.2rem; font-weight: 900; margin-bottom: 20px; }
 .win-msg.p1 { color: var(--blue); }
 .win-msg.cpu { color: var(--red); }
 
-/* Block Mined Flash Effect */
 #block-flash {
   position: fixed; inset: 0; background: radial-gradient(ellipse at center, rgba(255,215,100,0.95) 0%, rgba(255,255,255,0.9) 100%);
   z-index: 90; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -204,58 +210,44 @@ h1.logo .b { color: var(--gold); }
 }
 #block-flash.show { animation: flashAnim 4s forwards; }
 @keyframes flashAnim { 0% { opacity: 1; } 10% { opacity: 1; } 100% { opacity: 0; } }
-.bf-title { font-family: var(--font-hud); font-size: 2rem; font-weight: 900; color: #000; letter-spacing: 0.2em; }
-.bf-height { font-family: var(--font-hud); font-size: 5rem; font-weight: 900; color: #000; margin: 10px 0; text-shadow: 0 0 20px rgba(255,255,255,0.8); }
-.bf-sub { font-family: var(--font-hud); font-size: 1.5rem; font-weight: 900; color: var(--red); }
+.bf-title { font-family: var(--font-hud); font-size: 1.8rem; font-weight: 900; color: #000; letter-spacing: 0.2em; }
+.bf-height { font-family: var(--font-hud); font-size: 4rem; font-weight: 900; color: #000; margin: 10px 0; text-shadow: 0 0 20px rgba(255,255,255,0.8); }
 
-/* ==========================================================
-   RESPONSIVE DESIGN (モバイル対応)
-========================================================== */
-@media (max-width: 1050px) {
-  /* 画面が狭い場合は、UIを上部に、対戦画面を左右に配置する */
+@media (max-width: 850px) {
   #game-container {
     grid-template-columns: 1fr 1fr;
     grid-template-areas: "cp cp" "p1 cpu";
-    gap: 20px; padding: 15px;
+    gap: 15px; padding: 10px;
   }
-  .center-panel { grid-area: cp; flex-direction: row; flex-wrap: wrap; justify-content: center; }
-  .ui-box { flex: 1; min-width: 250px; }
-  .player-panel { max-width: 100%; }
+  .center-panel { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+  .ui-box { flex: 1; min-width: 200px; }
+  .pc-only { display: none; }
 }
 
-@media (max-width: 650px) {
-  /* スマホの極小画面では縦一列にする */
-  #game-container {
-    grid-template-columns: 1fr;
-    grid-template-areas: "p1" "cpu" "cp";
-  }
+@media (max-width: 500px) {
+  #game-container { grid-template-columns: 1fr; grid-template-areas: "p1" "cpu" "cp"; }
+  .player-panel { max-width: 100%; }
 }
 </style>
 </head>
 <body>
 
-<!-- BACKGROUND -->
 <div id="starfield"></div>
 
-<!-- HEADER -->
 <header>
   <div>
-    <h1 class="logo"><span class="b">₿</span>びっぷよ <span style="font-size:0.8rem;color:var(--text-dim)">VS CPU</span></h1>
+    <h1 class="logo"><span class="b">₿</span>びっぷよ <span style="font-size:0.7rem;color:var(--text-dim)">VS CPU</span></h1>
     <div class="sub">Bitcoin Mempool Falling Puzzle</div>
   </div>
   <div class="pill"><div class="dot" id="ws-status"></div><span id="ws-label">Connecting...</span></div>
 </header>
 
-<!-- BLOCK MINED EFFECT -->
 <div id="block-flash">
   <div class="bf-title">⛏ NEW BLOCK MINED ⛏</div>
   <div class="bf-height" id="bf-height">#000000</div>
-  <div class="bf-sub">BOARD RESET BONUS!!</div>
 </div>
 
-<!-- MODALS -->
 <div id="overlays">
-  <!-- START MODAL -->
   <div id="modal-start" class="modal">
     <div class="m-title">₿びっぷよ</div>
     <div class="m-desc">
@@ -267,24 +259,22 @@ h1.logo .b { color: var(--gold); }
     <button class="m-btn vs" id="btn-start">⚡ BATTLE START ⚡</button>
   </div>
 
-  <!-- GAME OVER MODAL -->
   <div id="modal-gameover" class="modal hidden">
     <div class="win-msg" id="go-msg">CPU WINS!</div>
-    <div style="display:flex; justify-content:space-around; width:100%; margin-bottom:30px;">
+    <div style="display:flex; justify-content:space-around; width:100%; margin-bottom:20px;">
       <div>
         <span class="score-label">PLAYER 1</span>
-        <span class="player-score" id="go-score-p1" style="color:var(--blue); font-size:1.8rem;">0</span>
+        <span class="player-score" id="go-score-p1" style="color:var(--blue); font-size:1.6rem;">0</span>
       </div>
       <div>
         <span class="score-label">CPU</span>
-        <span class="player-score" id="go-score-cpu" style="color:var(--red); font-size:1.8rem;">0</span>
+        <span class="player-score" id="go-score-cpu" style="color:var(--red); font-size:1.6rem;">0</span>
       </div>
     </div>
     <button class="m-btn" id="btn-restart">PLAY AGAIN</button>
   </div>
 </div>
 
-<!-- MAIN GAME CONTAINER -->
 <div id="game-container">
   
   <!-- LEFT: PLAYER 1 -->
@@ -305,7 +295,6 @@ h1.logo .b { color: var(--gold); }
   <!-- CENTER: UI PANELS -->
   <div class="center-panel" style="grid-area: cp;">
     
-    <!-- NEXT PIECE -->
     <div class="ui-box">
       <div class="ui-title"><i>→</i> NEXT PIECE</div>
       <div class="next-wrapper"><canvas id="canvas-next"></canvas></div>
@@ -315,7 +304,6 @@ h1.logo .b { color: var(--gold); }
       </div>
     </div>
 
-    <!-- MEMPOOL STATS -->
     <div class="ui-box">
       <div class="ui-title"><i>∿</i> NETWORK STATS</div>
       <div class="stat-row">
@@ -328,19 +316,17 @@ h1.logo .b { color: var(--gold); }
       </div>
       <div class="stat-row" style="margin-top:6px;">
         <span class="stat-label">Fee Rate (Fast)</span>
-        <span class="stat-val" id="stat-fee" style="font-size:0.9rem;">——</span>
+        <span class="stat-val" id="stat-fee" style="font-size:0.85rem;">——</span>
       </div>
     </div>
 
-    <!-- TX QUEUE -->
     <div class="ui-box">
       <div class="ui-title"><i>⚡</i> FALLING QUEUE (<span id="q-count">0</span>)</div>
       <div class="q-list" id="queue-list">
-        <div style="font-size:0.65rem; color:var(--text-dim); text-align:center; padding:10px;">Waiting for TXs...</div>
+        <div style="font-size:0.6rem; color:var(--text-dim); text-align:center; padding:10px;">Waiting for TXs...</div>
       </div>
     </div>
 
-    <!-- CONTROLS -->
     <div class="ui-box pc-only">
       <div class="ui-title"><i>⌨</i> CONTROLS</div>
       <div class="ctrl-row"><span class="ctrl-key">←</span> <span class="ctrl-key">→</span><span>Move Left / Right</span></div>
@@ -369,17 +355,13 @@ h1.logo .b { color: var(--gold); }
 
 </div>
 
-<!-- ==========================================================
-   JAVASCRIPT ENGINE
-========================================================== -->
 <script>
 /** 
  * Constants & Configurations 
  */
 const COLS = 6, ROWS = 12;
-// 内部キャンバスの論理サイズを定義（CSS側で画面に合わせて拡縮される）
 const LOGICAL_WIDTH = 360, LOGICAL_HEIGHT = 720; 
-const CELL = LOGICAL_WIDTH / COLS; // 60px
+const CELL = LOGICAL_WIDTH / COLS;
 
 const PUYO_COLORS = {
   red:    { base: 'rgba(255, 20, 20, 0.3)',  glow: '#ff0033', edge: '#ff7878', inner: 'rgba(220, 0, 0, 0.9)' },
@@ -420,9 +402,6 @@ function fmtAmt(s) {
 }
 function rCol() { return PUYO_IDS[Math.floor(Math.random() * PUYO_IDS.length)]; }
 
-/**
- * Piece & Board Generation
- */
 function buildCells(tier) {
   const sz = tier.size, c0 = rCol(), col = t => t.mono ? c0 : rCol();
   if(sz === 1) return [{ dr: 0, dc: 0, colorId: c0 }];
@@ -444,9 +423,6 @@ class Piece {
   rotateCCW() { this.cells = this.cells.map(c => ({ dr: -c.dc, dc: c.dr, colorId: c.colorId })); }
 }
 
-/**
- * Effects (Particles & Texts)
- */
 class Part {
   constructor(x, y, colId) {
     this.x = x; this.y = y; this.color = PUYO_COLORS[colId]?.glow || '#fff';
@@ -477,15 +453,11 @@ class FloatingText {
   }
 }
 
-/**
- * Player Class (Handles P1 & CPU Logic independently)
- */
 class Player {
   constructor(id, isCPU, canvasId, scoreId, trayId) {
     this.id = id; this.isCPU = isCPU;
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext('2d');
-    // 解像度をセット
     this.canvas.width = LOGICAL_WIDTH; this.canvas.height = LOGICAL_HEIGHT;
     this.scoreEl = document.getElementById(scoreId);
     this.trayEl = document.getElementById(trayId);
@@ -501,6 +473,7 @@ class Player {
     this.ojamaQueue = 0; this.targetCol = -1;
     this.parts = []; this.fTexts = [];
     this.updateScoreUI();
+    this.trayEl.innerHTML = ''; this.trayEl.classList.remove('warning');
   }
 
   updateScoreUI() { this.scoreEl.textContent = this.score.toLocaleString(); }
@@ -525,7 +498,6 @@ class Player {
     if(!this.active) return;
     const bk = this.active.cells.map(c => ({ ...c }));
     dir === 'cw' ? this.active.rotateCW() : this.active.rotateCCW();
-    // Wall kick
     for(const [dr, dc] of [[0,0], [0,1], [0,-1], [0,2], [0,-2], [-1,0], [-2,0]]) {
       const test = this.active.cells.map(c => ({ r: this.active.pr + c.dr + dr, c: this.active.pc + c.dc + dc, colorId: c.colorId }));
       if(this.canPlace(test)) {
@@ -534,7 +506,7 @@ class Player {
         return;
       }
     }
-    this.active.cells = bk; // revert
+    this.active.cells = bk; 
   }
 
   hardDrop() {
@@ -548,7 +520,6 @@ class Player {
     this.active = null; this.state = 'FALL';
   }
 
-  // ★フリーズ対策：1フレームに1マスずつ正確に落下させる堅牢なロジック
   gravity() {
     let moved = false;
     for(let c = 0; c < COLS; c++) {
@@ -595,7 +566,6 @@ class Player {
         if(nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && this.board[nr][nc] === 'dust') dusts.push({ r: nr, c: nc });
       });
     });
-    // 重複排除
     return dusts.filter((v, i, a) => a.findIndex(t => (t.r === v.r && t.c === v.c)) === i);
   }
 
@@ -608,9 +578,6 @@ class Player {
   }
 }
 
-/**
- * Global Game State
- */
 let players = [];
 let txQ = [];
 let gameOn = false;
@@ -619,13 +586,9 @@ let keys = {};
 let snd = true;
 
 const nctx = document.getElementById('canvas-next').getContext('2d');
-document.getElementById('canvas-next').width = 240; document.getElementById('canvas-next').height = 160;
+document.getElementById('canvas-next').width = 240; document.getElementById('canvas-next').height = 120;
 
-/**
- * Core Logic Functions
- */
 function loadNextFor(p) {
-  // ★フリーズ防止：常に最低限のダミーTXをキューに確保
   if(txQ.length < 5) {
     [5e5, 2e6, 1e4, 8e7, 3e5].forEach(s => txQ.push({ _s: s, vout: [{ value: s }] }));
   }
@@ -639,7 +602,6 @@ function loadNextFor(p) {
 function cpuThink(p) {
   if(!p.active) return;
   if(p.targetCol === -1) {
-    // 賢いAI：盤面の一番低い列を狙う
     let heights = [];
     for(let c = 0; c < COLS; c++) {
       let r = 0; while(r < ROWS && p.board[r][c] === null) r++;
@@ -654,7 +616,6 @@ function cpuThink(p) {
     p.targetCol = validCols.length ? validCols[Math.floor(Math.random() * validCols.length)] : 2;
   }
 
-  // 移動と回転
   if(p.active.pc > p.targetCol) p.mv(0, -1);
   else if(p.active.pc < p.targetCol) p.mv(0, 1);
   else {
@@ -671,13 +632,11 @@ function updateEngine() {
   players.forEach((p, idx) => {
     if(p.state === 'IDLE') return;
 
-    // Effects Update
     for(let i = p.parts.length - 1; i >= 0; i--) { p.parts[i].step(); if(p.parts[i].life <= 0) p.parts.splice(i, 1); }
     for(let i = p.fTexts.length - 1; i >= 0; i--) { p.fTexts[i].step(); if(p.fTexts[i].life <= 0) p.fTexts.splice(i, 1); }
 
     if(p.state === 'PLAY') {
       if(!p.active) {
-        // おじゃまダストの落下処理
         if(p.ojamaQueue > 0) {
           let dropCount = Math.min(p.ojamaQueue, COLS);
           let cols = []; for(let i = 0; i < COLS; i++) if(p.board[0][i] === null) cols.push(i);
@@ -698,29 +657,26 @@ function updateEngine() {
         if(!p.spawn()) { gameOver(p.isCPU ? 'YOU WIN! 🎉' : 'CPU WINS! ☠️'); return; }
       }
 
-      // Input & AI Processing
       if(p.isCPU) {
         if(++p.dropT >= 25) { p.dropT = 0; cpuThink(p); }
         if(AF % 40 === 0) { if(!p.mv(1, 0)) p.lock(); }
       } else {
         const soft = keys['ArrowDown'] || keys['KeyS'];
-        const iv = soft ? 3 : Math.max(8, 36 - Math.floor(p.score / 3000)); // スコアで加速
+        const iv = soft ? 3 : Math.max(8, 36 - Math.floor(p.score / 3000));
         if(++p.dropT >= iv) { p.dropT = 0; if(!p.mv(1, 0)) p.lock(); }
       }
     }
     else if(p.state === 'FALL') {
-      if(!p.gravity()) { // 落下完了
+      if(!p.gravity()) { 
         const gs = p.findGroups();
         if(gs.length) {
           p.eCells = gs.flat().concat(p.clearDust(gs));
           p.eraseT = 32; p.chain++; p.state = 'ERASE';
           if(!p.isCPU) sfx('chain', p.chain);
 
-          // スコア計算: (消した数 × 100) × 連鎖数の2乗
           const pts = p.eCells.length * 100 * p.chain * p.chain;
           p.score += pts; p.updateScoreUI();
           
-          // おじゃま攻撃計算 (1500点につき1つ)
           let ojama = Math.floor(pts / 1500);
           if(ojama > 0) {
             const opp = players[1 - idx];
@@ -731,7 +687,6 @@ function updateEngine() {
             }
           }
           
-          // エフェクト生成
           let cx = LOGICAL_WIDTH / 2, cy = LOGICAL_HEIGHT / 2;
           const chainColor = p.chain === 1 ? '#ffd040' : p.chain === 2 ? '#ff6600' : '#ff3333';
           p.fTexts.push(new FloatingText(cx, cy, `${p.chain}連鎖!`, chainColor, 44));
@@ -742,7 +697,6 @@ function updateEngine() {
     }
     else if(p.state === 'ERASE') {
       if(--p.eraseT <= 0) {
-        // 消滅完了、パーティクル生成
         p.eCells.forEach(c => {
           for(let i = 0; i < 6; i++) p.parts.push(new Part(c.c * CELL + CELL / 2, c.r * CELL + CELL / 2, p.board[c.r][c.c]));
           p.board[c.r][c.c] = null;
@@ -753,28 +707,22 @@ function updateEngine() {
   });
 }
 
-/**
- * Rendering Logic
- */
 function drawPuyo(ctx, px, py, sz, colorId, nb, alpha = 1) {
   const cd = PUYO_COLORS[colorId] || PUYO_COLORS.red;
   const cx = px + sz / 2, cy = py + sz / 2;
   ctx.globalAlpha = alpha;
   const rad = sz * 0.44, bw = sz * 0.7, h = sz / 2 + 2;
   
-  // Outer Glow & Connection
   ctx.shadowBlur = 15; ctx.shadowColor = cd.glow; ctx.fillStyle = cd.base;
   ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2); ctx.fill();
   if(nb.u) ctx.fillRect(cx - bw / 2, py - 1, bw, h); if(nb.d) ctx.fillRect(cx - bw / 2, cy - 1, bw, h);
   if(nb.l) ctx.fillRect(px - 1, cy - bw / 2, h, bw); if(nb.r) ctx.fillRect(cx - 1, cy - bw / 2, h, bw);
   
-  // Inner Cores
   ctx.shadowBlur = 0; ctx.fillStyle = cd.edge;
   ctx.beginPath(); ctx.arc(cx, cy, sz * 0.40, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = cd.inner;
   ctx.beginPath(); ctx.arc(cx, cy, sz * 0.32, 0, Math.PI * 2); ctx.fill();
   
-  // Eyes (Not for Dust)
   if(colorId !== 'dust') {
     ctx.fillStyle = 'rgba(255,255,255,0.95)';
     ctx.beginPath(); ctx.ellipse(cx - sz * 0.14, cy - sz * 0.06, sz * 0.09, sz * 0.13, 0, 0, Math.PI * 2); ctx.fill();
@@ -799,13 +747,11 @@ function renderPlayer(p) {
   const ctx = p.ctx;
   ctx.clearRect(0, 0, p.canvas.width, p.canvas.height);
   
-  // Background Grid Lines
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'; ctx.lineWidth = 2; ctx.beginPath();
   for(let x = 0; x <= LOGICAL_WIDTH; x += CELL) { ctx.moveTo(x, 0); ctx.lineTo(x, LOGICAL_HEIGHT); }
   for(let y = 0; y <= LOGICAL_HEIGHT; y += CELL) { ctx.moveTo(0, y); ctx.lineTo(LOGICAL_WIDTH, y); }
   ctx.stroke();
 
-  // Draw Fixed Blocks
   const eSet = new Set(p.eCells.map(c => `${c.r},${c.c}`));
   for(let r = 0; r < ROWS; r++) {
     for(let c = 0; c < COLS; c++) {
@@ -824,9 +770,7 @@ function renderPlayer(p) {
     }
   }
 
-  // Draw Active Falling Piece
   if(p.state === 'PLAY' && p.active) {
-    // Ghost Piece Calculation
     let gpr = p.active.pr;
     while(p.canPlace(p.active.cells.map(c => ({ r: gpr + 1 + c.dr, c: p.active.pc + c.dc, colorId: c.colorId })))) gpr++;
     if(gpr !== p.active.pr) {
@@ -839,14 +783,12 @@ function renderPlayer(p) {
         }
       });
     }
-    // Actual Piece
     const pm = {}; p.active.abs().forEach(c => { if(!pm[c.r]) pm[c.r] = {}; pm[c.r][c.c] = c.colorId; });
     p.active.abs().forEach(c => {
       if(c.r >= 0 && c.r < ROWS) drawPuyo(ctx, c.c * CELL, c.r * CELL, CELL, c.colorId, getNbM(c.r, c.c, c.colorId, pm));
     });
   }
 
-  // Draw Effects
   p.parts.forEach(pt => pt.draw(ctx));
   p.fTexts.forEach(f => f.draw(ctx));
 }
@@ -857,9 +799,6 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-/**
- * Input Handling
- */
 window.addEventListener('keydown', e => {
   if(e.repeat) return; keys[e.code] = true;
   let p = players[0]; if(!p || p.state !== 'PLAY' || !p.active) return;
@@ -871,11 +810,8 @@ window.addEventListener('keydown', e => {
 });
 window.addEventListener('keyup', e => { keys[e.code] = false; });
 
-/**
- * UI Updaters
- */
 function updateNextUI() {
-  const p = players[0]; nctx.clearRect(0, 0, 240, 160);
+  const p = players[0]; nctx.clearRect(0, 0, 240, 120);
   if(!p || !p.nextPiece) return;
   const s = p.nextPiece.sats, t = p.nextPiece.tier;
   document.getElementById('next-tier').textContent = t.name;
@@ -885,8 +821,8 @@ function updateNextUI() {
   const cells = p.nextPiece.cells;
   const minR = Math.min(...cells.map(c => c.dr)), maxR = Math.max(...cells.map(c => c.dr));
   const minC = Math.min(...cells.map(c => c.dc)), maxC = Math.max(...cells.map(c => c.dc));
-  const cs = Math.min(35, Math.floor(140 / Math.max(maxC - minC + 1, maxR - minR + 1)));
-  const ox = (240 - (maxC - minC + 1) * cs) / 2, oy = (160 - (maxR - minR + 1) * cs) / 2;
+  const cs = Math.min(30, Math.floor(100 / Math.max(maxC - minC + 1, maxR - minR + 1)));
+  const ox = (240 - (maxC - minC + 1) * cs) / 2, oy = (120 - (maxR - minR + 1) * cs) / 2;
   const pm = {}; cells.forEach(c => { const dr = c.dr - minR, dc = c.dc - minC; if(!pm[dr]) pm[dr] = {}; pm[dr][dc] = c.colorId; });
   cells.forEach(c => {
     const dr = c.dr - minR, dc = c.dc - minC;
@@ -902,9 +838,6 @@ function updateQueueUI() {
   }).join('');
 }
 
-/**
- * Network & WebSocket
- */
 function connectWS() {
   window.wsInit = true;
   const ws = new WebSocket('wss://mempool.space/api/v1/ws');
@@ -947,9 +880,6 @@ function connectWS() {
   ws.onclose = () => { document.getElementById('ws-status').className = 'dot err'; setTimeout(connectWS, 3000); };
 }
 
-/**
- * Game Flow Control
- */
 function startGame() {
   document.getElementById('modal-start').classList.add('hidden');
   document.getElementById('modal-gameover').classList.add('hidden');
@@ -961,7 +891,6 @@ function startGame() {
     new Player('CPU', true, 'canvas-cpu', 'score-cpu', 'tray-cpu')
   ];
 
-  // Dummy TX injection to prevent freeze
   [5e5, 2e6, 1e4, 8e7, 3e5].forEach(s => txQ.push({ _s: s, vout: [{ value: s }] }));
   players.forEach(p => { p.state = 'PLAY'; loadNextFor(p); });
   
@@ -982,7 +911,6 @@ function gameOver(msg) {
   sfx('boom');
 }
 
-// Event Listeners
 document.getElementById('btn-start').addEventListener('click', startGame);
 document.getElementById('btn-restart').addEventListener('click', startGame);
 
@@ -990,7 +918,6 @@ document.getElementById('btn-snd').addEventListener('click', function() {
   snd = !snd; this.textContent = snd ? '🔊 SOUND ON' : '🔇 SOUND OFF'; this.classList.toggle('on', snd); if(snd) gAC();
 });
 
-// Audio Context
 function gAC() { try { if(!AC && snd) AC = new (window.AudioContext || window.webkitAudioContext)(); if(AC && AC.state === 'suspended') AC.resume(); } catch(e) {} return AC; }
 function sfx(type, n = 1) {
   if(!AC || !snd) return; const t = AC.currentTime, o = AC.createOscillator(), g = AC.createGain(); o.connect(g); g.connect(AC.destination);
@@ -1004,7 +931,6 @@ function sfx(type, n = 1) {
   if(type === 'boom') { o.type = 'sawtooth'; o.frequency.setValueAtTime(130, t); o.frequency.exponentialRampToValueAtTime(12, t + .55); g.gain.setValueAtTime(.25, t); g.gain.exponentialRampToValueAtTime(.001, t + .6); o.start(t); o.stop(t + .65); }
 }
 
-// Start Engine
 requestAnimationFrame(gameLoop);
 
 </script>
